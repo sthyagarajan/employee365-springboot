@@ -1,0 +1,71 @@
+buildscript {
+    repositories {
+       // mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        //classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.1.RELEASE")
+        classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.19.2"
+    }
+}
+
+
+group = 'com.auth0'
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.palantir.docker'
+apply plugin: 'com.palantir.docker-run'
+
+
+bootWar{
+    baseName = 'com.employee365'
+    version =  '0.1.0'
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
+dependencies {
+    compile 'com.auth0:mvc-auth-commons:1.0.0'
+    compile 'com.auth0:mvc-auth-commons:1.+'
+    compile 'com.restfb:restfb:1.34.1'
+    compile 'org.springframework.boot:spring-boot-starter-web:2.0.1.RELEASE'
+    compile group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.4'
+
+    runtime 'org.springframework.boot:spring-boot-starter-tomcat:2.0.1.RELEASE'
+    runtime 'org.apache.tomcat.embed:tomcat-embed-jasper:8.5.20'
+    runtime 'javax.servlet:jstl:1.2'
+
+    testCompile 'junit:junit:4.12'
+}
+
+docker {
+    dependsOn build
+    name "rajisunder/${bootWar.baseName}"
+    files bootWar.archivePath
+    tags 'latest'
+    buildArgs(['JAR_FILE': "${bootWar.archiveName}"])
+
+}
+
+
+dockerRun {
+    name 'my-container'
+    image "rajisunder/${bootWar.baseName}"
+    ports '5000:7080'
+    daemonize true
+}
