@@ -66,6 +66,6 @@ docker {
 dockerRun {
     name 'my-container'
     image "rajisunder/${bootWar.baseName}"
-    ports '5000:7080'
+    ports '5000:8080'
     daemonize true
 }
